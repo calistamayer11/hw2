@@ -1,73 +1,84 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int oddSumHelp(int count, int bound, int value)
+double two_d_random(int n)
 {
-    // fill in your code below
+    int counter = 0;
+    int startingArray[(2 * n) + 1][(2 * n) + 1];
 
-    if (value == 0 && count == 0)
+    for (int i = 0; i < ((2 * n) + 1); i++)
     {
-        return 1; // solution found
-    }
-
-    if (((value == 0) && (count > 0)) || (bound < 0) || (value < 0))
-    {
-        return 0; // no solution
-    }
-
-    if (bound % 2 == 0)
-    {
-        bound--;
-    }
-
-    // current bound
-    if (bound % 2 != 0 && bound <= value)
-    {
-        int answer = oddSumHelp(count - 1, bound - 2, value - bound);
-        if (answer)
+        for (int j = 0; j < ((2 * n) + 1); j++)
         {
-            printf("%d ", bound);
-            return 1;
+            startingArray[i][j] = 0;
+        }
+    }
+    // Fill in code below
+    // When deciding which way to go for the next step, generate a random number as follows.
+    // r = rand() % 4;
+    // Treat r = 0, 1, 2, 3 as up, right, down and left respectively.
+
+    // The random walk should stop once the x coordinate or y coordinate reaches $-n$ or $n$.
+    // The function should return the fraction of the visited $(x, y)$ coordinates inside (not including) the square.
+    int x = 0;
+    int y = 0;
+    while (!(x == n || x == -n || y == n || y == -n))
+    {
+        int r = rand() % 4;
+        startingArray[x + n][y + n] = 1;
+
+        if (r == 0)
+        {
+            y++;
+        }
+        if (r == 1)
+        {
+            x++;
+        }
+        if (r == 2)
+        {
+            y--;
+        }
+        if (r == 3)
+        {
+            x--;
         }
     }
 
-    // trying without current bound
-    int answer = oddSumHelp(count, bound - 2, value);
-    if (answer)
+    for (int q = 0; q < ((2 * n) + 1); q++)
     {
-        return 1;
+        for (int k = 0; k < ((2 * n) + 1); k++)
+        {
+            if (startingArray[q][k] == 1)
+            {
+                counter++;
+            }
+        }
     }
-
-    return 0;
+    int total = ((2 * n) - 1) * ((2 * n) - 1);
+    return (double)counter / total;
 }
 
 // Do not change the code below
-void oddSum(int count, int bound, int value)
-{
-    if (value <= 0 || count <= 0 || bound <= 0)
-        return;
-
-    if (bound % 2 == 0)
-        bound -= 1;
-
-    if (!oddSumHelp(count, bound, value))
-        printf("No solutions.\n");
-    else
-        printf("\n");
-}
-
 int main(int argc, char *argv[])
 {
-    if (argc != 4)
-        return -1;
+    int trials = 1000;
+    int i, n, seed;
+    if (argc == 2)
+        seed = atoi(argv[1]);
+    else
+        seed = 12345;
 
-    int count = atoi(argv[1]);
-    int bound = atoi(argv[2]);
-    int value = atoi(argv[3]);
-
-    // oddSum(12,30,200);
-    // oddSum(10,20,100);
-    // oddSum(20,20,200);
-    oddSum(count, bound, value);
+    srand(seed);
+    for (n = 1; n <= 64; n *= 2)
+    {
+        double sum = 0.;
+        for (i = 0; i < trials; i++)
+        {
+            double p = two_d_random(n);
+            sum += p;
+        }
+        printf("%d %.3lf\n", n, sum / trials);
+    }
     return 0;
 }
